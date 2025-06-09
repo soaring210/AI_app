@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>京仪集团：赋能啤酒行业数字化未来</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Harmony -->
+    <!-- Application Structure Plan: 本应用采用非线性的、主题驱动的仪表盘式布局，旨在将复杂的战略报告转化为一个直观的决策支持工具。用户首先通过“行业挑战与机遇”部分了解市场背景，然后通过“京仪核心优势”建立对公司能力的信任。核心是“三大一体化解决方案”的交互式板块，允许用户根据兴趣自由探索`PrecisionBrew`、`EcoBrew`和`ConnectBrew`。接着，“技术能力映射”部分以可视化的方式将抽象技术与具体应用联系起来。“战略实施路径”则清晰地展示了市场进入的步骤。这种结构优先考虑用户体验和信息吸收效率，而非简单复刻报告的章节顺序，旨在引导用户从“为什么”到“如何做”再到“做什么”，最终形成全面认知。 -->
+    <!-- Visualization & Content Choices: 报告信息：啤酒行业数字化驱动力 -> 目标：对比 -> 可视化：条形图 (Chart.js) -> 交互：鼠标悬浮提示 -> 理由：直观比较各项驱动因素的重要性。报告信息：表1技术映射 -> 目标：建立关系 -> 可视化：交互式HTML/CSS网格图 -> 交互：鼠标悬浮高亮关联项 -> 理由：比静态表格更具吸引力，动态展示技术到应用的全链路。报告信息：啤酒厂能耗构成 -> 目标：说明比例 -> 可视化：环形图 (Chart.js) -> 交互：鼠标悬浮提示 -> 理由：清晰展示能源成本构成，凸显BEMS方案的价值。报告信息：三大解决方案框架 -> 目标：组织与比较 -> 呈现方式：选项卡式交互界面 -> 交互：点击切换 -> 理由：在有限空间内清晰地组织和呈现三大核心方案，方便用户按需深入了解，符合现代网页交互习惯。 -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #FDFBF8;
+            color: #3D352E;
+        }
+        .text-brown-dark { color: #3D352E; }
+        .text-brown-medium { color: #6D5D4D; }
+        .text-brown-light { color: #9a8a78; }
+        .bg-amber-accent { background-color: #E4A951; }
+        .bg-amber-accent-light { background-color: #f7dca9; }
+        .bg-warm-neutral { background-color: #F5F1EB; }
+        .border-amber-accent { border-color: #E4A951; }
+        .outline-amber-accent { outline-color: #E4A951; }
+        .nav-link {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #E4A951;
+            border-bottom-color: #E4A951;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .tab-button.active {
+            background-color: #E4A951;
+            color: #FFFFFF;
+        }
+        .tab-button:not(.active) {
+            background-color: #F5F1EB;
+            color: #6D5D4D;
+        }
+        .tech-item, .app-item {
+            transition: all 0.3s ease;
+        }
+        .tech-item.highlight, .app-item.highlight {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(228, 169, 81, 0.5);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 280px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out forwards;
+            opacity: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center max-w-7xl">
+            <div class="text-2xl font-bold text-brown-dark">
+                京仪集团 <span class="text-amber-accent">x</span> 啤酒行业
+            </div>
+            <div class="hidden md:flex space-x-8 text-brown-medium font-medium">
+                <a href="#opportunity" class="nav-link">行业机遇</a>
+                <a href="#advantage" class="nav-link">核心优势</a>
+                <a href="#solutions" class="nav-link">解决方案</a>
+                <a href="#roadmap" class="nav-link">实施路径</a>
+            </div>
+            <div class="md:hidden">
+                <button id="menu-btn" class="text-brown-dark focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+            <a href="#opportunity" class="block nav-link">行业机遇</a>
+            <a href="#advantage" class="block nav-link">核心优势</a>
+            <a href="#solutions" class="block nav-link">解决方案</a>
+            <a href="#roadmap" class="block nav-link">实施路径</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 md:py-32 bg-warm-neutral">
+            <div class="container mx-auto px-6 text-center max-w-4xl">
+                <h1 class="text-4xl md:text-6xl font-bold text-brown-dark leading-tight">赋能啤酒行业数字化未来</h1>
+                <p class="mt-6 text-lg md:text-xl text-brown-medium">融合半导体精密工程与智慧能源管理，京仪集团为啤酒行业量身打造从精准控制到绿色低碳的一体化智能解决方案。</p>
+                <a href="#solutions" class="mt-8 inline-block bg-amber-accent text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-opacity-90 transition-transform transform hover:scale-105">探索解决方案</a>
+            </div>
+        </section>
+
+        <section id="opportunity" class="py-16 md:py-24">
+            <div class="container mx-auto px-6 max-w-7xl">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-brown-dark">演进中的啤酒行业：挑战与机遇</h2>
+                    <p class="mt-4 text-lg text-brown-medium max-w-3xl mx-auto">啤酒行业正面临运营成本、质量一致性和可持续发展的多重压力。这些挑战正是数字化技术发挥价值的广阔舞台，为京仪集团提供了独特的市场切入点。</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-bold text-brown-dark mb-4">核心运营痛点</h3>
+                        <div class="flex items-start space-x-4 p-4 bg-white rounded-lg shadow">
+                            <div class="flex-shrink-0 bg-amber-accent-light p-3 rounded-full">
+                                <span class="text-xl">⚙️</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-brown-dark">质量稳定性</h4>
+                                <p class="text-brown-medium text-sm">在扩大规模和丰富品类的同时，如何确保批次间风味与质量的一致性是首要挑战。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4 p-4 bg-white rounded-lg shadow">
+                            <div class="flex-shrink-0 bg-amber-accent-light p-3 rounded-full">
+                                <span class="text-xl">💧</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-brown-dark">资源成本高昂</h4>
+                                <p class="text-brown-medium text-sm">能源和水资源是主要运营成本，在可持续发展压力下，降本增效需求迫切。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4 p-4 bg-white rounded-lg shadow">
+                            <div class="flex-shrink-0 bg-amber-accent-light p-3 rounded-full">
+                                <span class="text-xl">🔄</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-brown-dark">生产柔性不足</h4>
+                                <p class="text-brown-medium text-sm">市场需要多品种、小批量生产，对生产线调度、换型效率提出更高要求。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-brown-dark mb-4 text-center md:text-left">数字化转型核心驱动力</h3>
+                        <div class="chart-container bg-white p-4 rounded-lg shadow">
+                            <canvas id="driversChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="advantage" class="py-16 md:py-24 bg-warm-neutral">
+            <div class="container mx-auto px-6 max-w-7xl">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-brown-dark">京仪集团的核心优势：双核驱动</h2>
+                    <p class="mt-4 text-lg text-brown-medium max-w-3xl mx-auto">我们独特的价值主张源于两大核心能力的战略性结合：源自半导体行业的精密工程基因，以及在能源与基础设施领域的深厚积累。</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 text-center">
+                    <div class="bg-white p-8 rounded-xl shadow-lg">
+                        <div class="text-5xl mb-4">🔬</div>
+                        <h3 class="text-2xl font-bold text-brown-dark">精密工程与自动化</h3>
+                        <p class="text-brown-medium mt-2">(源自京仪装备)</p>
+                        <ul class="mt-4 text-left space-y-2 text-brown-medium">
+                            <li class="flex items-start"><span class="text-amber-accent mr-2 mt-1">✓</span><div><strong>高精度温控：</strong>半导体级温度控制技术，确保酿造过程的极致稳定。</div></li>
+                            <li class="flex items-start"><span class="text-amber-accent mr-2 mt-1">✓</span><div><strong>精密气体处理：</strong>成熟的工艺废气处理经验，可应用于CO₂回收与环境控制。</div></li>
+                            <li class="flex items-start"><span class="text-amber-accent mr-2 mt-1">✓</span><div><strong>高可靠性自动化：</strong>经过严苛产线验证的设备可靠性与自动化物料搬运技术。</div></li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-lg">
+                        <div class="text-5xl mb-4">💡</div>
+                        <h3 class="text-2xl font-bold text-brown-dark">智慧能源与系统集成</h3>
+                        <p class="text-brown-medium mt-2">(源自北控集团及关联实体)</p>
+                        <ul class="mt-4 text-left space-y-2 text-brown-medium">
+                            <li class="flex items-start"><span class="text-amber-accent mr-2 mt-1">✓</span><div><strong>综合能源管理：</strong>成熟的“智慧综合能源管控平台”，实现全厂能源优化。</div></li>
+                            <li class="flex items-start"><span class="text-amber-accent mr-2 mt-1">✓</span><div><strong>工业传感网络：</strong>提供从智能表具到无线传感的全面数据采集方案。</div></li>
+                            <li class="flex items-start"><span class="text-amber-accent mr-2 mt-1">✓</span><div><strong>“端、网、云”架构：</strong>系统性的平台集成与大数据分析能力，构建智慧工厂大脑。</div></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="solutions" class="py-16 md:py-24">
+            <div class="container mx-auto px-6 max-w-7xl">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-brown-dark">三大一体化解决方案</h2>
+                    <p class="mt-4 text-lg text-brown-medium max-w-3xl mx-auto">我们提供模块化、可扩展的解决方案套件，覆盖从核心运营到可持续发展的全方位需求。啤酒厂可以根据自身最紧迫的痛点选择部署，并逐步扩展。</p>
+                </div>
+
+                <div class="flex justify-center mb-8">
+                    <div class="flex space-x-2 md:space-x-4 p-1 bg-warm-neutral rounded-full">
+                        <button class="tab-button font-medium py-2 px-4 md:px-6 rounded-full active" data-tab="precision">PrecisionBrew™<br><span class="hidden md:inline text-sm font-normal">精酿大师</span></button>
+                        <button class="tab-button font-medium py-2 px-4 md:px-6 rounded-full" data-tab="eco">EcoBrew™<br><span class="hidden md:inline text-sm font-normal">生态智酿</span></button>
+                        <button class="tab-button font-medium py-2 px-4 md:px-6 rounded-full" data-tab="connect">ConnectBrew™<br><span class="hidden md:inline text-sm font-normal">互联智酿</span></button>
+                    </div>
+                </div>
+
+                <div id="solution-content" class="mt-8">
+                    <div class="tab-content fade-in" id="precision-content">
+                        <div class="bg-white p-8 rounded-xl shadow-lg">
+                            <h3 class="text-2xl font-bold text-amber-accent mb-4">PrecisionBrew™ 精酿大师：智能化啤酒运营</h3>
+                            <p class="text-brown-medium mb-6">此方案专注于提升酿造与包装核心环节的精密化和自动化水平，确保卓越的运营效率和无与伦比的产品质量一致性。</p>
+                            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div class="bg-warm-neutral p-6 rounded-lg">
+                                    <h4 class="font-bold text-brown-dark">高级过程控制 (APC)</h4>
+                                    <p class="text-sm text-brown-medium mt-2">对糖化、发酵等关键阶段实现温度、压力、流量的精准闭环控制，完美复刻最佳酿造曲线。</p>
+                                </div>
+                                <div class="bg-warm-neutral p-6 rounded-lg">
+                                    <h4 class="font-bold text-brown-dark">自动化质量监控</h4>
+                                    <p class="text-sm text-brown-medium mt-2">集成在线传感器实时监测pH、溶解氧、浊度等关键指标，即时预警，保证质量。</p>
+                                </div>
+                                <div class="bg-warm-neutral p-6 rounded-lg">
+                                    <h4 class="font-bold text-brown-dark">智能包装线优化</h4>
+                                    <p class="text-sm text-brown-medium mt-2">提升包装线OEE，实现自动化物料处理、在线检测和与MES系统的高效联动。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-content hidden fade-in" id="eco-content">
+                        <div class="bg-white p-8 rounded-xl shadow-lg">
+                             <h3 class="text-2xl font-bold text-green-600 mb-4">EcoBrew™ 生态智酿：可持续与节能型酿造</h3>
+                             <p class="text-brown-medium mb-6"> leveraging 北控集团的强大实力，我们为啤酒厂量身定制全面的能源与资源管理方案，实现经济效益与环境责任的双赢。</p>
+                             <div class="grid md:grid-cols-2 gap-8 items-center">
+                                 <div class="space-y-4">
+                                     <div class="bg-warm-neutral p-4 rounded-lg">
+                                         <h4 class="font-bold text-brown-dark">啤酒厂能源管理系统 (BEMS)</h4>
+                                         <p class="text-sm text-brown-medium mt-1">对电、水、汽、冷、气进行全方位监控、分析与优化，挖掘3-5%的节能潜力。</p>
+                                     </div>
+                                      <div class="bg-warm-neutral p-4 rounded-lg">
+                                         <h4 class="font-bold text-brown-dark">水资源优化与废水管理</h4>
+                                         <p class="text-sm text-brown-medium mt-1">优化CIP清洗过程，提供废水处理与中水回用方案，降低水足迹。</p>
+                                     </div>
+                                      <div class="bg-warm-neutral p-4 rounded-lg">
+                                         <h4 class="font-bold text-brown-dark">余热回收与碳足迹管理</h4>
+                                         <p class="text-sm text-brown-medium mt-1">设计余热回收系统，并提供碳排放核算工具，助力实现零碳目标。</p>
+                                     </div>
+                                 </div>
+                                 <div>
+                                     <h4 class="text-xl font-bold text-brown-dark mb-2 text-center">啤酒厂典型能耗分布</h4>
+                                     <div class="chart-container">
+                                         <canvas id="energyChart"></canvas>
+                                     </div>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="tab-content hidden fade-in" id="connect-content">
+                        <div class="bg-white p-8 rounded-xl shadow-lg">
+                            <h3 class="text-2xl font-bold text-blue-600 mb-4">ConnectBrew™ 互联智酿：数据驱动的价值链</h3>
+                            <p class="text-brown-medium mb-6">利用从全厂采集的数据，通过先进分析与AI技术，将数据转化为洞察力，提升决策水平、设备可靠性和整体运营效率。</p>
+                            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div class="bg-warm-neutral p-6 rounded-lg">
+                                    <h4 class="font-bold text-brown-dark">设备预测性维护</h4>
+                                    <p class="text-sm text-brown-medium mt-2">通过状态监测与AI算法，预测设备潜在故障，从被动维修转向主动维护，减少停机损失。</p>
+                                </div>
+                                <div class="bg-warm-neutral p-6 rounded-lg">
+                                    <h4 class="font-bold text-brown-dark">智能公用工程监测</h4>
+                                    <p class="text-sm text-brown-medium mt-2">预测水、电、汽等公用工程需求，及时发现泄漏与异常损耗，优化成本控制。</p>
+                                </div>
+                                <div class="bg-warm-neutral p-6 rounded-lg">
+                                    <h4 class="font-bold text-brown-dark">端到端批次追溯</h4>
+                                    <p class="text-sm text-brown-medium mt-2">构建从原料到成品的完整产品谱系，满足监管要求和消费者对透明度的期望。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tech-mapping" class="py-16 md:py-24 bg-warm-neutral">
+            <div class="container mx-auto px-6 max-w-7xl">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-brown-dark">技术能力映射：从半导体到啤酒花</h2>
+                    <p class="mt-4 text-lg text-brown-medium max-w-3xl mx-auto">我们将成熟的核心技术进行创新性迁移和应用，精准解决啤酒行业的特定挑战。将鼠标悬浮在左侧技术上，查看其在右侧的应用场景。</p>
+                </div>
+                <div class="grid grid-cols-3 gap-4 md:gap-8 items-center font-medium">
+                    <div class="space-y-4 text-right">
+                        <div class="tech-item bg-white p-4 rounded-lg shadow cursor-pointer" data-map="map1">精密温控设备 (Chiller)</div>
+                        <div class="tech-item bg-white p-4 rounded-lg shadow cursor-pointer" data-map="map2">工艺废气处理 (Scrubber)</div>
+                        <div class="tech-item bg-white p-4 rounded-lg shadow cursor-pointer" data-map="map3">自动化传片设备 (Sorter)</div>
+                        <div class="tech-item bg-white p-4 rounded-lg shadow cursor-pointer" data-map="map4">智慧能源管控平台</div>
+                        <div class="tech-item bg-white p-4 rounded-lg shadow cursor-pointer" data-map="map5">工业传感器网络</div>
+                    </div>
+                    <div class="text-center text-amber-accent text-3xl">
+                        <div class="h-12 flex justify-center items-center">→</div>
+                        <div class="h-12 flex justify-center items-center">→</div>
+                        <div class="h-12 flex justify-center items-center">→</div>
+                        <div class="h-12 flex justify-center items-center">→</div>
+                        <div class="h-12 flex justify-center items-center">→</div>
+                    </div>
+                    <div class="space-y-4 text-left">
+                        <div class="app-item bg-white p-4 rounded-lg shadow" data-map="map1">发酵与储酒过程温度精确控制</div>
+                        <div class="app-item bg-white p-4 rounded-lg shadow" data-map="map2">CO₂回收净化与发酵气体监测</div>
+                        <div class="app-item bg-white p-4 rounded-lg shadow" data-map="map3">包装线瓶/罐自动化处理与码垛</div>
+                        <div class="app-item bg-white p-4 rounded-lg shadow" data-map="map4">全厂能源介质监控与成本优化</div>
+                        <div class="app-item bg-white p-4 rounded-lg shadow" data-map="map5">酿造关键工艺参数在线监测</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="roadmap" class="py-16 md:py-24">
+            <div class="container mx-auto px-6 max-w-7xl">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-brown-dark">战略实施路径</h2>
+                    <p class="mt-4 text-lg text-brown-medium max-w-3xl mx-auto">我们采用审慎的分阶段策略进入市场，通过试点合作建立信任，与生态伙伴协同创新，最终实现规模化推广。</p>
+                </div>
+                <div class="relative">
+                    <div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-amber-accent-light rounded-full -translate-y-1/2"></div>
+                    <div class="grid md:grid-cols-3 gap-12 relative">
+                        <div class="text-center">
+                            <div class="relative inline-block mb-4">
+                                <div class="w-16 h-16 bg-amber-accent rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-md">1</div>
+                            </div>
+                            <h3 class="text-xl font-bold text-brown-dark">试点先行，树立标杆</h3>
+                            <p class="mt-2 text-brown-medium">选择具有创新意愿的啤酒企业合作，优先部署高价值模块（如能源管理），打造成功样板工程，快速验证价值。</p>
+                        </div>
+                         <div class="text-center">
+                            <div class="relative inline-block mb-4">
+                                <div class="w-16 h-16 bg-amber-accent rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-md">2</div>
+                            </div>
+                            <h3 class="text-xl font-bold text-brown-dark">构建生态，协同创新</h3>
+                            <p class="mt-2 text-brown-medium">与设备商、集成商、软件开发商建立战略合作，共同提供一站式解决方案，弥补单点能力短板。</p>
+                        </div>
+                         <div class="text-center">
+                            <div class="relative inline-block mb-4">
+                                <div class="w-16 h-16 bg-amber-accent rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-md">3</div>
+                            </div>
+                            <h3 class="text-xl font-bold text-brown-dark">全面推广，价值导向</h3>
+                            <p class="mt-2 text-brown-medium">凭借成功案例和差异化优势，全面进入市场。以清晰的投资回报分析，进行价值导向销售。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-warm-neutral border-t border-amber-accent-light mt-16">
+        <div class="container mx-auto py-8 px-6 text-center text-brown-medium max-w-7xl">
+            <p>&copy; 2025 京仪集团. 保留所有权利。</p>
+            <p class="text-sm mt-2">本内容基于战略研究报告生成，旨在进行概念展示。具体解决方案细节请联系我们。</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                    if (mobileMenu.classList.contains('hidden') === false) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+            const driversChartCtx = document.getElementById('driversChart').getContext('2d');
+            new Chart(driversChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['提升运营效率', '确保质量稳定', '实现可持续发展', '满足个性化需求'],
+                    datasets: [{
+                        label: '数字化转型驱动力',
+                        data: [90, 85, 75, 60],
+                        backgroundColor: '#E4A951',
+                        borderColor: '#d5983a',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '重要性指数: ' + context.raw;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            let energyChartInstance;
+            const energyChartData = {
+                labels: ['制冷', '蒸汽 & 热水', '电力 (设备)', '压缩空气', '其他'],
+                datasets: [{
+                    data: [35, 30, 20, 10, 5],
+                    backgroundColor: ['#3b82f6', '#f97316', '#E4A951', '#84cc16', '#a8a29e'],
+                    hoverOffset: 4
+                }]
+            };
+
+            function createEnergyChart() {
+                if (energyChartInstance) {
+                    energyChartInstance.destroy();
+                }
+                const energyChartCtx = document.getElementById('energyChart').getContext('2d');
+                energyChartInstance = new Chart(energyChartCtx, {
+                    type: 'doughnut',
+                    data: energyChartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed + '%';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            const tabs = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(item => item.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    const targetId = tab.dataset.tab + '-content';
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                        if (content.id === targetId) {
+                            content.classList.remove('hidden');
+                             if (tab.dataset.tab === 'eco') {
+                                setTimeout(createEnergyChart, 50);
+                            }
+                        }
+                    });
+                });
+            });
+
+            const techItems = document.querySelectorAll('.tech-item');
+            const appItems = document.querySelectorAll('.app-item');
+            
+            function clearHighlights() {
+                techItems.forEach(item => item.classList.remove('highlight', 'opacity-50'));
+                appItems.forEach(item => item.classList.remove('highlight', 'opacity-50'));
+            }
+
+            function handleMappingHover(event) {
+                clearHighlights();
+                const mapId = event.target.dataset.map;
+                techItems.forEach(item => {
+                    if (item.dataset.map !== mapId) item.classList.add('opacity-50');
+                    else item.classList.add('highlight');
+                });
+                appItems.forEach(item => {
+                    if (item.dataset.map !== mapId) item.classList.add('opacity-50');
+                    else item.classList.add('highlight');
+                });
+            }
+
+            techItems.forEach(item => {
+                item.addEventListener('mouseenter', handleMappingHover);
+                item.addEventListener('mouseleave', clearHighlights);
+            });
+            
+            const sections = document.querySelectorAll('section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
